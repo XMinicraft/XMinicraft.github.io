@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XMinicraft</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #131313;
+      color: #fff;
+    }
+
+    main, header {
+      width: 90%;
+      margin: auto;
+    }
+
+    header {
+      padding-top: 1rem;
+    }
+
+    main {
+      padding-top: 1rem;
+      padding-bottom: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #232323;
+    }
+
+    tr:nth-child(even) {
+      background: #181818;
+    }
+
+    td, th {
+      border: 1px solid #444;
+    }
+
+    td, th {
+      padding: 0.7rem 1rem;
+    }
+
+    td button {
+      text-decoration: none;
+      color: #fff;
+      text-align: center;
+      background: rgb(32, 114, 238);
+      padding: 0.4rem 0.5rem;
+      font-weight: bold;
+      border-radius: 3px;
+      margin: 0.1rem 0;
+      display: block;
+      width: max-content;
+      border: none;
+      font-size: 1rem;
+    }
+
+    td button:hover {
+      background: rgb(26, 93, 192);
+    }
+
+    td button:active {
+      background: rgb(19, 69, 143);
+    }
+  </style>
+</head>
+<body>
+    <header>
+      <h1>Downloads</h1>
+    </header>
+    <main>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Release Time</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody id="versions-tbody">
+        </tbody>
+      </table>
+    </main>
+
+    <script>
+        const cache = {};
+
+        fetch('https://XMinicraft.github.io/xmeta/version_manifest.json').then(res => res.json()).then(data => {
+          const tbody = document.getElementById('versions-tbody');
+          for (const version of data.versions) {
+            const tr = document.createElement('tr');
+            const tdId = document.createElement('td');
+            const tdRT = document.createElement('td');
+            const tdT = document.createElement('td');
+            const tdDL = document.createElement('td');
+            const aTdDL = document.createElement('button');
+            
+            tdId.textContent = version.id;
+            tdRT.textContent = new Date(version.release_time).toLocaleString();
+            tdT.textContent = version.type;
+
+            aTdDL.textContent = 'Download';
+            aTdDL.addEventListener('click', () => {
+              if (version.id in cache) {
+                console.log('c');
+                const a = document.createElement('a');
+                a.download = version.id + '.jar';
+                a.href = cache[version.id].downloads.client.url;
+                a.click();
+              } else {
+                console.log('nc');
+
+                fetch(version.url).then(res => res.json()).then(data1 => {
+                  cache[version.id] = data1;
+
+                  const a = document.createElement('a');
+                  a.download = version.id + '.jar';
+                  a.href = cache[version.id].downloads.client.url;
+                  a.click();
+                });
+              }
+            });
+            tdDL.appendChild(aTdDL);
+
+            tr.appendChild(tdId);
+            tr.appendChild(tdRT);
+            tr.appendChild(tdT);
+            tr.appendChild(tdDL);
+            tbody.appendChild(tr);
+          }
+        });
+    </script>
+</body>
+</html>
