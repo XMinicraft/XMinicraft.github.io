@@ -12,7 +12,7 @@
       font-family: Arial, Helvetica, sans-serif;
     }
 
-    body {
+    body, html {
       background: #131313;
       color: #fff;
     }
@@ -61,6 +61,7 @@
       font-weight: bold;
       border-radius: 3px;
       margin: 0.1rem 0;
+      cursor: pointer;
       display: block;
       width: max-content;
       border: none;
@@ -84,9 +85,10 @@
       <table>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>UID</th>
             <th>Release Time</th>
             <th>Type</th>
+            <th></th>
           </tr>
         </thead>
         <tbody id="versions-tbody">
@@ -97,9 +99,11 @@
     <script>
         const cache = {};
 
-        fetch('https://XMinicraft.github.io/xmeta/version_manifest.json').then(res => res.json()).then(data => {
+        fetch('https://XMinicraft.github.io/meta/minicraft/version_manifest.json').then(res => res.json()).then(data => {
           const tbody = document.getElementById('versions-tbody');
           for (const version of data.versions) {
+            if (version.type !== 'java') continue;
+
             const tr = document.createElement('tr');
             const tdId = document.createElement('td');
             const tdRT = document.createElement('td');
@@ -107,7 +111,7 @@
             const tdDL = document.createElement('td');
             const aTdDL = document.createElement('button');
             
-            tdId.textContent = version.id;
+            tdId.textContent = version.uid;
             tdRT.textContent = new Date(version.release_time).toLocaleString();
             tdT.textContent = version.type;
 
@@ -116,18 +120,18 @@
               if (version.id in cache) {
                 console.log('c');
                 const a = document.createElement('a');
-                a.download = version.id + '.jar';
-                a.href = cache[version.id].downloads.client.url;
+                a.download = version.uid + '.jar';
+                a.href = cache[version.uid].downloads.client.url;
                 a.click();
               } else {
                 console.log('nc');
 
-                fetch(version.url).then(res => res.json()).then(data1 => {
-                  cache[version.id] = data1;
+                fetch('https://XMinicraft.github.io/meta/minicraft/' + version.uid + '.json').then(res => res.json()).then(data1 => {
+                  cache[version.uid] = data1;
 
                   const a = document.createElement('a');
-                  a.download = version.id + '.jar';
-                  a.href = cache[version.id].downloads.client.url;
+                  a.download = version.uid + '.jar';
+                  a.href = cache[version.uid].downloads.client.url;
                   a.click();
                 });
               }
